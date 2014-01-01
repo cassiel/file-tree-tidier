@@ -10,7 +10,7 @@ I wanted to pull all of the photos out of my messy iPhoto directory structure, w
 
 Feel free to create an *uberjar*, or else just run with Leiningen:
 
-        lein run --from-dir ~/Pictures/iPhoto\ Library/Masters/
+        lein run --from-dir ~/Pictures/iPhoto\ Library/Masters/ \
                  --to-dir ~/SOMEWHERE-MORE-SENSIBLE
 
 Both root directories must exist.
