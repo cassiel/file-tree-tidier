@@ -72,5 +72,5 @@
                       "If present, delete files after copying"]])]
     (if errors
       (dorun (map println errors))
-      (doseq [[f [d t]] (take 100 (files-and-stamps (:from-dir options)))]
+      (doseq [[f [d t]] (files-and-stamps (:from-dir options))]
         (process (:to-dir options) f d t (:delete-after options))))))
