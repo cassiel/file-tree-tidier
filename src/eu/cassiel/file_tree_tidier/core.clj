@@ -26,6 +26,27 @@
   (DigestUtils/md5Hex (FileInputStream. f)))
 
 (defn examine
+  "Look for a file with the base name of `file` in a directory in the root,
+   whose name starts with `path`. So: a file FOO.JPG created 2014-01-24
+   will be found in root/2014-01-14 but also in root/014-01-14_EVENT."
+  [root file path _]
+  (let [md (md5 file)
+        candidate-dirs (seq
+                        (->
+                         (File. root)
+                         (.listFiles (reify java.io.FileFilter
+                                       (accept [_ f] (and (.isDirectory f)
+                                                          (-> f
+                                                              (fs/base-name)
+                                                              (.startsWith path))))))))
+        matching-file (some #(let [f (File. % (fs/base-name file))]
+                               (when (.exists f) f))
+                            candidate-dirs)]
+    (if matching-file
+      [(if (= md (md5 matching-file)) :exists :clash) matching-file]
+      [:not-present (-> root (File. path) (File. (fs/base-name file)))])))
+
+(defn examine-OLD
   [root file path1 path2]
   (let [dest-file (-> root
                       (File. path1)

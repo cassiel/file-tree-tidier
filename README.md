@@ -1,4 +1,4 @@
-`-*- word-wrap: t; -*-`
+`-*- mode: markdown; mode: visual-line; -*-`
 
 # file-tree-tidier
 
