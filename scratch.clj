@@ -17,6 +17,10 @@
                                        (fs/base-name)
                                        (.startsWith "2014-01-07"))))))))
 
+(File. "/Users/nick/")
+
+(format "%10s" "A")
+
 (fs/base-name (File. "/Users/nick/2013-01-01.X"))
 
 (c/examine "/Users/nick/Desktop/IMAGE-OUT"

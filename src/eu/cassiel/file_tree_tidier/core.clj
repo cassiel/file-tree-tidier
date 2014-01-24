@@ -59,18 +59,26 @@
        :not-present)
      dest-file]))
 
+(defn report [msg root-1 file-1 root-2 file-2]
+  (letfn [(strip [f] (-> (File. f) (.toString)))
+          (tidy [root file] (if (.startsWith file root)
+                              (.substring file (count root))
+                              file))]
+    (println (format "%10s %20s -> %-20s"
+                     (str "[" msg "]")
+                     (tidy (strip root-1) (strip file-1))
+                     (tidy (strip root-2) (strip file-2))))))
+
 (defn process
   "Copy file to the correct path from the root, if it's not there already. Flag an error if another
    file is there (with different MD5)."
-  [root file path1 path2 delete-after?]
-  (let [[status dest-file] (examine root file path1 path2)]
+  [in-root out-root file path1 path2 delete-after?]
+  (let [[status dest-file] (examine out-root file path1 path2)]
     (condp = status
-      :exists (do (println "  dup" (str file))
+      :exists (do #_ (report "dup" in-root (str file) out-root (str dest-file))
                   (when delete-after? (.delete file)))
-      :clash (do (println "CLASH" (str file))
-                 (println  "  <>" (str dest-file)))
-      :not-present (do (println " copy" (str file))
-                       (println "   ->" (str dest-file))
+      :clash (report "*CLASH*" in-root (str file) out-root (str dest-file))
+      :not-present (do (report "copy" in-root (str file) out-root (str dest-file))
                        (fs/copy+ file dest-file)
                        (.setLastModified dest-file (.lastModified file))
                        (when delete-after? (.delete file))))))
@@ -93,4 +101,4 @@
     (if errors
       (dorun (map println errors))
       (doseq [[f [d t]] (files-and-stamps (:from-dir options))]
-        (process (:to-dir options) f d t (:delete-after options))))))
+        (process (:from-dir options) (:to-dir options) f d t (:delete-after options))))))
