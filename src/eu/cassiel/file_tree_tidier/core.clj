@@ -57,9 +57,7 @@
          :exists
          :clash)
        :not-present)
-     dest-file]
-    )
-  )
+     dest-file]))
 
 (defn process
   "Copy file to the correct path from the root, if it's not there already. Flag an error if another
@@ -67,11 +65,12 @@
   [root file path1 path2 delete-after?]
   (let [[status dest-file] (examine root file path1 path2)]
     (condp = status
-      :exists (when delete-after? (.delete file))
+      :exists (do (println "  dup" (str file))
+                  (when delete-after? (.delete file)))
       :clash (do (println "CLASH" (str file))
                  (println  "  <>" (str dest-file)))
-      :not-present (do (println "copy" (str file))
-                       (println "  ->" (str dest-file))
+      :not-present (do (println " copy" (str file))
+                       (println "   ->" (str dest-file))
                        (fs/copy+ file dest-file)
                        (.setLastModified dest-file (.lastModified file))
                        (when delete-after? (.delete file))))))
